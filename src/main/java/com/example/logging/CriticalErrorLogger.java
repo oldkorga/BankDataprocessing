@@ -6,9 +6,7 @@ import org.slf4j.LoggerFactory;
 import com.example.enums.AppConstants;
 
 import java.io.IOException;
-import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.StandardOpenOption;
 
 public class CriticalErrorLogger {
     private static final Logger logger = LoggerFactory.getLogger(CriticalErrorLogger.class);
@@ -18,7 +16,8 @@ public class CriticalErrorLogger {
     public void logCriticalError(String reason) {
         try {
             String detailEntry = String.format("[CRITICAL ERROR] Reason: %s ", reason);
-            Files.writeString(detailLog, detailEntry, Files.exists(detailLog) ? StandardOpenOption.APPEND : StandardOpenOption.CREATE);
+            LogFileManager.writeToLog(detailLog, detailEntry);
+
         } catch (IOException e) {
             logger.error("Failed to log critical error: " + e.getMessage());
         }

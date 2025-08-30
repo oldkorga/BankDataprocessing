@@ -1,4 +1,4 @@
-package com.example.util;
+package com.example.filereader;
 
 import com.example.logging.CriticalErrorLogger;
 import com.example.logging.DataValidLogger;
@@ -33,11 +33,11 @@ public class FileReader {
                         List<String> lines = Files.readAllLines(file);
                         allLines.addAll(lines);
                     } catch (IOException e) {
-                        errorDataLogger.logDataValid("Failed to read file: " + file.toString() + ": " + e.getMessage() + ". Proceeding with partial execution.");
+                        errorDataLogger.logDataValidation("Failed to read file: " + file.toString() + ": " + e.getMessage() + ". Proceeding with partial execution.");
                     }
                 }
             }
-        }catch (IOException e) {
+        } catch (IOException e) {
             criticalLogger.logCriticalError("Critical error walking directory: " + e.getMessage() + ". Execution terminated.");
             throw e;
         }
@@ -46,7 +46,7 @@ public class FileReader {
 
     public static String[] parseLine(String line) {
         if (line == null || line.trim().isEmpty()) {
-            errorDataLogger.logDataValid("Skipping empty or null line");
+            errorDataLogger.logDataValidation("Skipping empty or null line");
             return null;
         }
 

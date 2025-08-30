@@ -31,7 +31,7 @@ public class EmployeeDataSorter implements DataSorter {
         }
     }
 
-    private String[] extractManager(List<String[]> data) {
+    protected String[] extractManager(List<String[]> data) {
         Iterator<String[]> iterator = data.iterator();
         while (iterator.hasNext()) {
             String[] fields = iterator.next();

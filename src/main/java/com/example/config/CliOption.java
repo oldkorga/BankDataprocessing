@@ -9,51 +9,47 @@ import java.util.Arrays;
 import java.util.Optional;
 
 public enum CliOption {
-
     SORT("--sort", "-s", "sort", true) {
         @Override
-        public void apply(ConfigBuilder builder, String value) {
-            if (value != null && (AppConstants.SORT_NAME.getValue().equals(value) || AppConstants.SORT_SALARY.getValue().equals(value))) {
+        public void apply(ApplicationConfig.ConfigBuilder builder, String value) {
+            if (value != null && isValidSortValue(value)) {
                 builder.setSortBy(value);
             } else if (value != null) {
-                System.out.println("Logging invalid sortBy: " + value);
-                errorDataLogger.logDataValid("Ignoring invalid sortBy value '%s'. Execution will proceed without sorting.", value);
+                ApplicationConfig.errorDataLogger.logDataValidation("Ignoring invalid sort value '{}'. Valid values are: {}", value, Arrays.toString(AppConstants.getValidSortValues()));
+                builder.setSortBy(null); // Явно устанавливаем null для некорректного значения
             }
         }
     },
+
     ORDER("--order", null, "order", true) {
         @Override
-        public void apply(ConfigBuilder builder, String value) {
-            if (value != null && (AppConstants.ORDER_ASC.getValue().equals(value) || AppConstants.ORDER_DESC.getValue().equals(value))) {
+        public void apply(ApplicationConfig.ConfigBuilder builder, String value) {
+            if (value != null && isValidOrderValue(value)) {
                 builder.setSortOrder(value);
             } else if (value != null) {
-                System.out.println("Logging invalid sortOrder: " + value);
-                errorDataLogger.logDataValid("Ignoring invalid sortOrder value '%s'. Execution will proceed without sorting.", value);
+                ApplicationConfig.errorDataLogger.logDataValidation("Ignoring invalid sortOrder value '%s'. Valid values are: %s. Execution will proceed without sorting.",
+                        value, Arrays.toString(new String[]{AppConstants.ORDER_ASC.getValue(), AppConstants.ORDER_DESC.getValue()}));
             }
         }
     },
 
     STAT("--stat", null, "stat", false) {
         @Override
-        public void apply(ConfigBuilder builder, String value) {
-            builder.setStat(true); // Не требует значения
+        public void apply(ApplicationConfig.ConfigBuilder builder, String value) {
+            builder.setStat(true);
         }
     },
 
     OUTPUT("--output", "-o", "output", true) {
         @Override
-        public void apply(ConfigBuilder builder, String value) {
-            if (value != null && (AppConstants.DEFAULT_OUTPUT.getValue().equals(value) || AppConstants.OUTPUT_FILE.getValue().equals(value))) {
-                builder.setOutput(value);
-            } else {
-                throw new IllegalArgumentException("Output must be 'console' or 'file', got: " + value);
-            }
+        public void apply(ApplicationConfig.ConfigBuilder builder, String value) {
+            builder.setOutput(value);
         }
     },
 
     PATH("--path", null, "path", true) {
         @Override
-        public void apply(ConfigBuilder builder, String value) {
+        public void apply(ApplicationConfig.ConfigBuilder builder, String value) {
             if (value != null && !value.trim().isEmpty()) {
                 builder.setOutputPath(value);
             } else {
@@ -63,7 +59,7 @@ public enum CliOption {
     };
 
     private static final Logger logger = LoggerFactory.getLogger(CliOption.class);
-    private static final DataValidLogger errorDataLogger = new DataValidLogger();
+    private static final DataValidLogger errorDataLogger = ApplicationConfig.errorDataLogger;
 
     private final String longName;
     private final String shortName;
@@ -77,7 +73,7 @@ public enum CliOption {
         this.hasValue = hasValue;
     }
 
-    public abstract void apply(ConfigBuilder builder, String value);
+    public abstract void apply(ApplicationConfig.ConfigBuilder builder, String value);
 
     public static Optional<CliOption> fromString(String arg) {
         return Arrays.stream(values())
@@ -89,10 +85,18 @@ public enum CliOption {
 
     public String extractValue(String arg) {
         if (!hasValue) return null;
-
         if (arg.contains("=")) {
             return arg.split("=", 2)[1].trim();
         }
         return null;
+    }
+
+    private static boolean isValidSortValue(String value) {
+        return value != null && Arrays.stream(AppConstants.getValidSortValues())
+                .anyMatch(validValue -> validValue.equals(value));
+    }
+
+    private static boolean isValidOrderValue(String value) {
+        return value != null && (AppConstants.ORDER_ASC.getValue().equals(value) || AppConstants.ORDER_DESC.getValue().equals(value));
     }
 }

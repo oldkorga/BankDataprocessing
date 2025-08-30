@@ -23,11 +23,11 @@ public class DepartmentFilesWriter implements FilesWriter {
     public void writeDepartmentFile(String department, List<String[]> data) throws IOException {
         if (data == null || department == null) {
             String reason = "Invalid input: " + (data == null ? "data is null" : "department is null");
-            errorDataLogger.logDataValid(reason);
+            errorDataLogger.logDataValidation(reason);
             return;
         }
         if (data.isEmpty()) {
-            errorDataLogger.logDataValid("Data is empty for department: " + department);
+            errorDataLogger.logDataValidation("Data is empty for department: " + department);
             return;
         }
 
@@ -38,7 +38,7 @@ public class DepartmentFilesWriter implements FilesWriter {
 
         String cleanedDepartment = cleanDepartmentName(department);
         if (cleanedDepartment.isEmpty()) {
-            errorDataLogger.logDataValid("Empty department name: " + department);
+            errorDataLogger.logDataValidation("Empty department name: " + department);
             return;
         }
 
@@ -63,7 +63,7 @@ public class DepartmentFilesWriter implements FilesWriter {
         try {
             Files.write(outputFile, lines, StandardOpenOption.CREATE, StandardOpenOption.TRUNCATE_EXISTING);
         } catch (IOException e) {
-            errorDataLogger.logDataValid("Failed to write to file " + outputFile + ": " + e.getMessage() + ". Proceeding with partial execution.");
+            errorDataLogger.logDataValidation("Failed to write to file " + outputFile + ": " + e.getMessage() + ". Proceeding with partial execution.");
             throw e;
         }
     }

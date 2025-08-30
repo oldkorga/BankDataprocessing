@@ -12,8 +12,7 @@ public class DirectoryManager {
     private static final Logger logger = LoggerFactory.getLogger(DirectoryManager.class);
     private static final Path OUTPUT_DIR = Paths.get("src/main/resources/output").toAbsolutePath();
     private static final Path DEPARTMENTS_DIR = Paths.get("src/main/resources/output/departaments").toAbsolutePath();
-    private static final Path LOG_PACKAGE = Paths.get("output");
-   // private static final Path LOG_PACKAGE = OUTPUT_DIR.resolve("logs").toAbsolutePath().normalize();
+    private static final Path LOG_PACKAGE = OUTPUT_DIR.resolve("logs").toAbsolutePath().normalize();
 
     private DirectoryManager() {
     }

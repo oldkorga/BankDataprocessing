@@ -9,7 +9,7 @@ import com.example.logging.DataValidLogger;
 import com.example.logging.FileErrorLogger;
 import com.example.sorting.EmployeeDataSorter;
 import com.example.statistic.DepartmentStatisticCreator;
-import com.example.util.FileReader;
+import com.example.filereader.FileReader;
 import com.example.directoriesManager.DirectoryManager;
 
 
@@ -25,7 +25,7 @@ public class EmployeeProcessor implements DataProcessor {
     private final DepartmentStatisticCreator statisticCreator = new DepartmentStatisticCreator();
     private static final FileErrorLogger errorLogger = new FileErrorLogger();
     private static final CriticalErrorLogger criticalLogger = new CriticalErrorLogger();
-    private static final DataValidError errorDataLogger = new DataValidLogger();
+    private static final DataValidLogger errorDataLogger = new DataValidLogger();
 
     public void processFiles(String[] args) throws IOException {
         ApplicationConfig config = ApplicationConfig.fromArgs(args);
@@ -174,7 +174,6 @@ public class EmployeeProcessor implements DataProcessor {
 
         String salaryStr = fields[3].trim();
         try {
-            double salary = Double.parseDouble(salaryStr);
             if (managerDepartments.containsKey(employeeManagerId)) {
                 String department = managerDepartments.get(employeeManagerId);
                 departmentData.computeIfAbsent(department, k -> new ArrayList<>()).add(fields);
@@ -194,7 +193,7 @@ public class EmployeeProcessor implements DataProcessor {
         try {
             writer.writeDepartmentFile(department, data);
         } catch (IOException e) {
-            errorDataLogger.logDataValid("Failed to write department file for " + department + ": " + e.getMessage() + ". Proceeding with partial execution.");
+            errorDataLogger.logDataValidation("Failed to write department file for " + department + ": " + e.getMessage() + ". Proceeding with partial execution.");
         }
     }
 
@@ -202,7 +201,7 @@ public class EmployeeProcessor implements DataProcessor {
         try {
             statisticCreator.createStatistic(departmentData, output, outputPath);
         } catch (IOException e) {
-            errorDataLogger.logDataValid("Failed to generate statistics for output " + (outputPath != null ? outputPath : "default") + ": " + e.getMessage() + ". Proceeding with partial execution.");
+            errorDataLogger.logDataValidation("Failed to generate statistics for output " + (outputPath != null ? outputPath : "default") + ": " + e.getMessage() + ". Proceeding with partial execution.");
         }
     }
 }

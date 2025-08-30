@@ -22,7 +22,9 @@ public enum AppConstants {
         return value;
     }
 
-    public boolean equals(String other) {
-        return this.value.equals(other);
+    public static String[] getValidSortValues() {
+        return new String[]{SORT_NAME.getValue(), SORT_SALARY.getValue()};
     }
+
+
 }

@@ -1,5 +1,6 @@
 package com.example.config;
 
+
 public class ConfigBuilder {
     private String sortBy;
     private String sortOrder;
@@ -33,6 +34,6 @@ public class ConfigBuilder {
     }
 
     public ApplicationConfig build() {
-        return new ApplicationConfig(sortBy, sortOrder, stat, output, outputPath);
+        return new ApplicationConfig( sortBy, sortOrder, stat, output, outputPath);
     }
 }

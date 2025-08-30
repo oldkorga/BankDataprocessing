@@ -3,12 +3,10 @@ package com.example.statistic;
 import com.example.enums.AppConstants;
 import com.example.logging.DataValidLogger;
 import com.example.logging.FileErrorLogger;
-import com.example.directoriesManager.DirectoryManager;
 
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.nio.file.StandardOpenOption;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -17,7 +15,6 @@ import java.util.Map;
 
 public class DepartmentStatisticCreator implements StatisticCreator {
 
-    private static final Path OUTPUT = DirectoryManager.getOUTPUT_DIR().toAbsolutePath();
     private static final FileErrorLogger errorLogger = new FileErrorLogger();
     private static final DataValidLogger errorDataLogger = new DataValidLogger();
 
@@ -40,7 +37,7 @@ public class DepartmentStatisticCreator implements StatisticCreator {
             stats.add(String.format("%s,%.2f,%.2f,%.2f", result.department(), result.min(), result.max(), result.mid()));
         }
 
-        writeStatistics(stats, output, outputPath != null ? Paths.get(outputPath) : OUTPUT);
+        writeStatistics(stats, output, outputPath != null ? Path.of(outputPath) : null);
     }
 
     private List<Double> collectSalaries(Map.Entry<String, List<String[]>> entry) {
@@ -49,7 +46,7 @@ public class DepartmentStatisticCreator implements StatisticCreator {
         List<String[]> values = entry.getValue();
 
         if (values == null || values.isEmpty()) {
-            errorDataLogger.logDataValid("No data available for department: " + department);
+            errorDataLogger.logDataValidation("No data available for department: " + department);
             return salaries;
         }
 
@@ -68,7 +65,7 @@ public class DepartmentStatisticCreator implements StatisticCreator {
     private Double parseAndValidateSalary(String[] fields, String department) {
         String salaryStr = fields[3];
         if (salaryStr == null || salaryStr.trim().isEmpty()) {
-            errorDataLogger.logDataValid("Empty salary field for department: " + department);
+            errorDataLogger.logDataValidation("Empty salary field for department: " + department);
             return null;
         }
 
@@ -105,21 +102,20 @@ public class DepartmentStatisticCreator implements StatisticCreator {
 
     private void writeStatistics(List<String> stats, String output, Path outputPath) throws IOException {
         if (AppConstants.DEFAULT_OUTPUT.getValue().equals(output)) {
-            stats.forEach(System.out::println);
-        } else if (AppConstants.OUTPUT_FILE.getValue().equals(output)) {
-            if (outputPath == null) {
-                errorDataLogger.logDataValid("Output path is null for file output. Proceeding with default output.");
-                return;
-            }
-
+            stats.forEach(System.out::println); // Вывод в консоль при дефолтном значении
+            return;
+        }
+        if (AppConstants.OUTPUT_FILE.getValue().equals(output) && outputPath != null) {
             ensureOutputDirectoryExists(outputPath);
-
             try {
                 Files.write(outputPath, stats, StandardOpenOption.CREATE, StandardOpenOption.TRUNCATE_EXISTING);
             } catch (IOException e) {
-                errorDataLogger.logDataValid("Failed to write statistics to file " + outputPath.toString() + ": " + e.getMessage() + ". Proceeding with partial execution.");
+                errorDataLogger.logDataValidation("Failed to write statistics to file %s: %s. Switching to console output.", outputPath, e.getMessage());
+                stats.forEach(System.out::println);
                 throw e;
             }
+        } else {
+            stats.forEach(System.out::println);
         }
     }
 
@@ -142,20 +138,9 @@ public class DepartmentStatisticCreator implements StatisticCreator {
             this.mid = mid;
         }
 
-        public String department() {
-            return department;
-        }
-
-        public double min() {
-            return min;
-        }
-
-        public double max() {
-            return max;
-        }
-
-        public double mid() {
-            return mid;
-        }
+        public String department() { return department; }
+        public double min() { return min; }
+        public double max() { return max; }
+        public double mid() { return mid; }
     }
 }
