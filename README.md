@@ -53,7 +53,10 @@ java --version
 ## запуск производился с
 
 OpenJDK Runtime Environment Temurin-17.0.16+8 (build 17.0.16+8)
+https://adoptium.net/temurin/releases/?version=17.0.16+8
 
 Apache Maven 3.9.9
+https://maven.apache.org/download.cgi
 
 Apache Maven Daemon (mvnd) 1.0.2 windows-amd64 native client
+https://downloads.apache.org/maven/mvnd/1.0.2/maven-mvnd-1.0.2-windows-amd64.zip
